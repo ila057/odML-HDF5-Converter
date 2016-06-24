@@ -5,12 +5,11 @@ The jar files required are : <br>
 1. EEGLoader_2.2.jar <br>
 2. javacpp-1.1.jar <br>
 3. jdom-2.0.6.jar <br>
-4. nix-linux-x86_64.jar
+4. nix-linux-x86_64.jar <br>
+5. odml.jar <br>
+6. slf4j-api-1.7.21.jar <br>
+7. slf4j-simple-1.7.21.jar <br>
+8. joda-time-2.4.jar
 
-
-In case odML java library is added for use (is not currently used), the following jar files will also be required: <br>
-1. odml.jar <br>
-2. slf4j-api-1.7.21.jar <br>
-3. slf4j-simple-1.7.21.jar
 
 The total number of channels is taken as the default channel number. There is provision to change the default channel number, as shown in the MainClass.java (example usage).
