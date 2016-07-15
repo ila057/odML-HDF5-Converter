@@ -4,7 +4,7 @@ This is a  library for conversion of any metadata from odML to HDF5 format,and v
 The jar files required are : <br>
 1. EEGLoader_2.2.jar <br>
 2. javacpp-1.1.jar <br>
-3. jdom-2.0.6.jar <br>
+3. jdom-1.1.3.jar <br>
 4. nix-linux-x86_64.jar <br>
 5. odml-java-lib-1.1.7.jar <br>
 6. slf4j-api-1.7.21.jar <br>
