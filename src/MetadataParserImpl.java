@@ -159,8 +159,8 @@ public class MetadataParserImpl implements MetadataParser {
                     }
                 }
                 processGUINamespaces(parentSec, thisProperty);
+                Property prop = parentSec.createProperty(nameOfProperty, valueOfProperty);
             }
-            Property prop = parentSec.createProperty(nameOfProperty, valueOfProperty);
         }
     }
 
