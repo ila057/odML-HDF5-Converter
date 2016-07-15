@@ -8,7 +8,7 @@ public class MainClass {
      *
      */
     public static void main(String args[]){
-        ODMLParser odmlParser = new ODMLParser("Experiment_208_Driver's_attention_with_visual_stimulation_and_audio_disturbance", "metadata.xml", "LED_26_3_2014_0004.eeg", "LED_26_3_2014_0004.vhdr");
+        ODMLParserImpl odmlParser = new ODMLParserImpl("Experiment_208_Driver's_attention_with_visual_stimulation_and_audio_disturbance", "metadata.xml", "LED_26_3_2014_0004.eeg", "LED_26_3_2014_0004.vhdr");
         odmlParser.parseODML();
     }
 }
