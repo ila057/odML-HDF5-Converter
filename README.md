@@ -4,9 +4,9 @@ This is a  library for conversion of any metadata from odML to HDF5 format,and v
 Getting starged:
 
 Install maven libraries not available in the central repository:
-mvn install:install-file -Dfile=lib/EEGLoader_2.2.jar -DgroupId=cz.zcu.kiv.eeg -DartifactId=EEGLoader -Dversion=2.2 -Dpackaging=jar
-mvn install:install-file -Dfile=lib/nix-linux-x86_64.jar -DgroupId=org.gnode -DartifactId=nix-linux-x86_64 -Dversion=1.0 -Dpackaging=jar
-mvn install:install-file -Dfile=lib/odml.jar -DgroupId=odml.core -DartifactId=odml -Dversion=1.0 -Dpackaging=jar
+mvn install:install-file -Dfile=lib/EEGLoader_2.2.jar -DgroupId=cz.zcu.kiv.eeg -DartifactId=EEGLoader -Dversion=2.2 -Dpackaging=jar <br>
+mvn install:install-file -Dfile=lib/nix-linux-x86_64.jar -DgroupId=org.gnode -DartifactId=nix-linux-x86_64 -Dversion=1.0 -Dpackaging=jar <br>
+mvn install:install-file -Dfile=lib/odml.jar -DgroupId=odml.core -DartifactId=odml -Dversion=1.0 -Dpackaging=jar <br>
 
 
 The jar files required are : <br>
