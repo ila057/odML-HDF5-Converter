@@ -47,7 +47,8 @@ public class DataParserImpl implements DataParser{
         try {
             convertedBinaryData = dataTransformer.readBinaryData(headerFile, dataFile, size, ByteOrder.BIG_ENDIAN);
         } catch (IOException e) {
-            logger.error("Could not convert binary data successfully");
+            logger.error("Could not convert binary data successfully : "+e);
+            throw new RuntimeException("context",e);
         }
         return convertedBinaryData;
     }
@@ -58,7 +59,8 @@ public class DataParserImpl implements DataParser{
         try {
             channelInfo = dataTransformer.getChannelInfo(headerFile);
         } catch (IOException e) {
-            logger.error("Could not get number of channels successfully");
+            logger.error("Could not get number of channels successfully : "+e);
+            throw new RuntimeException("context",e);
         }
         return channelInfo.size();
     }

@@ -1,4 +1,5 @@
 //import core.MetadataCreator;
+import core.MetadataCreator;
 import core.MetadataParser;
 import odml.core.Reader;
 import odml.core.Writer;
@@ -21,7 +22,7 @@ import java.util.Vector;
 /**
  * Created by ipsita on 7/13/16.
  */
-public class MetadataCreatorImpl {
+public class MetadataCreatorImpl implements MetadataCreator{
 
     String hd5File;
     Map<Integer,String> dataTypeMap = new HashMap<>();
@@ -54,7 +55,7 @@ public class MetadataCreatorImpl {
 
     }
 
-    public void createOdml(String odmlFileName) throws IOException {
+    public void createOdml(String odmlFileName)  {
 
         File fileRead = initializeHDF5Reader();
         logger.debug(fileRead.getBlockCount() + " | " + fileRead.getBlock(0).getName() + " | " + fileRead.getSectionCount() + " | "+fileRead.getSection(0));
@@ -62,73 +63,80 @@ public class MetadataCreatorImpl {
         Section rootSection = new Section();
         rootSection.setName("metadataSection");
 
-        OutputStream outputstream = new FileOutputStream(odmlFileName);
+        try {
+            OutputStream outputstream = new FileOutputStream(odmlFileName);
 
 
-        //parsing hdf5 file
-        org.g_node.nix.Section metaDataSection = fileRead.getSection(0);
-        rootSection.setDocumentVersion(String.valueOf(fileRead.getVersion()[0]));
+            //parsing hdf5 file
+            org.g_node.nix.Section metaDataSection = fileRead.getSection(0);
+            rootSection.setDocumentVersion(String.valueOf(fileRead.getVersion()[0]));
 
-        List<org.g_node.nix.Section> ChildSections = metaDataSection.findSections();
-        for(org.g_node.nix.Section childSection:ChildSections){
+            List<org.g_node.nix.Section> ChildSections = metaDataSection.findSections();
+            for (org.g_node.nix.Section childSection : ChildSections) {
 
-            List<org.g_node.nix.Property> propertyList = childSection.getProperties();
+                List<org.g_node.nix.Property> propertyList = childSection.getProperties();
 
-            //writing name of new section
-            Section childSectionOdml = new Section();
-            childSectionOdml.setName(childSection.getName());
-            childSectionOdml.setType(childSection.getType());
+                //writing name of new section
+                Section childSectionOdml = new Section();
+                childSectionOdml.setName(childSection.getName());
+                childSectionOdml.setType(childSection.getType());
 
-            rootSection.add(childSectionOdml);
+                rootSection.add(childSectionOdml);
 
-            for(org.g_node.nix.Property property : propertyList){
-                String propertyName = property.getName();
-                int dataTypeIndex = property.getDataType();
+                for (org.g_node.nix.Property property : propertyList) {
+                    String propertyName = property.getName();
+                    int dataTypeIndex = property.getDataType();
 
-                org.g_node.nix.Value propertyValue = property.getValues().get(0);
-                String valueType = dataTypeMap.get(dataTypeIndex);
+                    org.g_node.nix.Value propertyValue = property.getValues().get(0);
+                    String valueType = dataTypeMap.get(dataTypeIndex);
 
-                try {
-                    Property propertyChildOdml;
+                    try {
+                        Property propertyChildOdml;
 
-                    switch (valueType) {
-                        case "string":
-                            propertyChildOdml = new Property(propertyName,propertyValue.getString(),"string");
-                            propertyChildOdml.setType("string");
-                            childSectionOdml.add(propertyChildOdml);
-                            break;
-                        case "int":
-                            propertyChildOdml = new Property(propertyName,propertyValue.getInt(),"int");
-                            childSectionOdml.add(propertyChildOdml);
-                            break;
-                        case "float":
-                            propertyChildOdml = new Property(propertyName,propertyValue.getDouble(),"float");
-                            childSectionOdml.add(propertyChildOdml);
-                            break;
-                        case "double":
-                            propertyChildOdml = new Property(propertyName,propertyValue.getDouble(),"double");
-                            childSectionOdml.add(propertyChildOdml);
-                            break;
-                        case "boolean":
-                            propertyChildOdml = new Property(propertyName,propertyValue.getBoolean(),"boolean");
-                            childSectionOdml.add(propertyChildOdml);
-                            break;
-                        case "long":
-                            propertyChildOdml = new Property(propertyName,propertyValue.getLong(),"long");
-                            childSectionOdml.add(propertyChildOdml);
-                            break;
-                        default:logger.error("ERROR. Some wrong valueType that is not supported.");
+                        switch (valueType) {
+                            case "string":
+                                propertyChildOdml = new Property(propertyName, propertyValue.getString(), "string");
+                                propertyChildOdml.setType("string");
+                                childSectionOdml.add(propertyChildOdml);
+                                break;
+                            case "int":
+                                propertyChildOdml = new Property(propertyName, propertyValue.getInt(), "int");
+                                childSectionOdml.add(propertyChildOdml);
+                                break;
+                            case "float":
+                                propertyChildOdml = new Property(propertyName, propertyValue.getDouble(), "float");
+                                childSectionOdml.add(propertyChildOdml);
+                                break;
+                            case "double":
+                                propertyChildOdml = new Property(propertyName, propertyValue.getDouble(), "double");
+                                childSectionOdml.add(propertyChildOdml);
+                                break;
+                            case "boolean":
+                                propertyChildOdml = new Property(propertyName, propertyValue.getBoolean(), "boolean");
+                                childSectionOdml.add(propertyChildOdml);
+                                break;
+                            case "long":
+                                propertyChildOdml = new Property(propertyName, propertyValue.getLong(), "long");
+                                childSectionOdml.add(propertyChildOdml);
+                                break;
+                            default:
+                                logger.error("ERROR. Some wrong valueType that is not supported.");
 
+                        }
+                    } catch (Exception e) {
+                        logger.error("IO Exception occurred while creating properties of odML metadata" + e);
+                        throw new RuntimeException("context",e);
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                
-            }
 
+                }
+
+            }
+            Writer writer = new Writer(rootSection, true, true);
+            writer.write(outputstream);
+        }catch (IOException e){
+            logger.error("IO Exception occurred while creating odML metadata"+e);
+            throw new RuntimeException("context",e);
         }
-        Writer writer = new Writer(rootSection, true, true);
-        writer.write(outputstream);
 
     }
 

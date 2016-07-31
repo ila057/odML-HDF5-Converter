@@ -1,3 +1,4 @@
+import core.DataCreator;
 import org.apache.log4j.Logger;
 import org.g_node.nix.*;
 import org.g_node.nix.File;
@@ -8,7 +9,7 @@ import java.util.List;
 /**
  * Created by ipsita on 7/25/16.
  */
-public class DataCreatorImpl {
+public class DataCreatorImpl implements DataCreator {
     static Logger logger = Logger.getLogger(DataCreatorImpl.class.getName());
     String hd5File;
 
@@ -36,7 +37,8 @@ public class DataCreatorImpl {
                 }
                 out.close();
             }catch(Exception e){
-                logger.error("Exception while extracting data from HDF5 file : "+e.getMessage());
+                logger.error("Exception while extracting data from HDF5 file : "+e);
+                throw new RuntimeException("context",e);
             }
         }
 

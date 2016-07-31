@@ -59,7 +59,9 @@ public class ODMLParserImpl implements ODMLParser {
             logger.info("done.");
 
         } catch (Exception e) {
-            logger.error("Exception occured in while parsing the odML parser and raw data ");
+            logger.error("Exception occured in while parsing the odML parser and raw data "+e);
+            throw new RuntimeException("context",e);
+
         }
 
     }

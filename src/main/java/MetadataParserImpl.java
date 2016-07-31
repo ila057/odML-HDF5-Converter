@@ -38,7 +38,8 @@ public class MetadataParserImpl implements MetadataParser {
             inputstream = new FileInputStream(metadataFile);
             rootSection = reader.load(inputstream, true);
         } catch (Exception e) {
-            logger.error("Exception occurred while loading  and reading odML input file. Please check if correct metadata file is provided");
+            logger.error("Exception occurred while loading  and reading odML input file. Please check if correct metadata file is provided "+e);
+            throw new RuntimeException("context",e);
         }
         return rootSection;
     }
@@ -75,7 +76,8 @@ public class MetadataParserImpl implements MetadataParser {
                 setSection(rootSectionMetadata, sectionVector);
             }
         } catch (Exception e) {
-            logger.error("Exception occurred while setting metadata in hdf5 file");
+            logger.error("Exception occurred while setting metadata in hdf5 file "+e);
+            throw new RuntimeException("context",e);
         }
 
     }
