@@ -1,4 +1,7 @@
-import core.MetadataParser;
+
+import cz.zcu.kiv.signal.ChannelInfo;
+import cz.zcu.kiv.signal.EEGMarker;
+import cz.zcu.kiv.signal.VhdrReader;
 import odml.core.Reader;
 import org.g_node.nix.Block;
 import org.g_node.nix.Property;
@@ -7,30 +10,32 @@ import org.g_node.nix.Value;
 import org.apache.log4j.*;
 
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.List;
-import java.util.Vector;
+import java.util.*;
 
 
 /**
  * Created by ipsita on 23/6/16.
  */
-public class MetadataParserImpl implements MetadataParser {
+public class MetadataParserImpl {//implements MetadataParser {
 
-    String metadataFile;
+    //String metadataFile;
+    //String vhdrFile="LED_26_3_2014_0004.vhdr";
+    //String vmrkFile="LED_26_3_2014_0004.vmrk";
     final static Logger logger = Logger.getLogger(MetadataParserImpl.class);
 
-    public MetadataParserImpl(String metadatFile) {
-        this.metadataFile = metadatFile;
-    }
+//    public converter.MetadataParserImpl(String metadatFile) {
+//        this.metadataFile = metadatFile;
+//    }
+//
+//    public converter.MetadataParserImpl() {
+//        this.metadataFile = "metadata.xml";
+//    }
 
-    public MetadataParserImpl() {
-        this.metadataFile = "metadata.xml";
-    }
 
-
-    public odml.core.Section initializeODMLReader(){
+    public odml.core.Section initializeODMLReader(String metadataFile){
         Reader reader = new Reader();
         odml.core.Section rootSection=new odml.core.Section();
         InputStream inputstream;
@@ -53,12 +58,12 @@ public class MetadataParserImpl implements MetadataParser {
      * @param block : Block whose metadata will be set
      * @param file : HDF5 (Specifically nix) file in which this metadata will be written
      */
-    public void setMetadata(String metadataFile, Block block, org.g_node.nix.File file) {
+    public void setMetadata(String metadataFile, Block block, org.g_node.nix.File file, String headerFile, String markerFile) {
 
         java.io.File inputFile = new java.io.File(metadataFile);
 
         try {
-            odml.core.Section rootSection = initializeODMLReader();
+            odml.core.Section rootSection = initializeODMLReader(metadataFile);
             String version = rootSection.getDocumentVersion();
             String date = rootSection.getDocumentDate().toString();
 
@@ -75,11 +80,86 @@ public class MetadataParserImpl implements MetadataParser {
             if(sectionVector.size()>0){
                 setSection(rootSectionMetadata, sectionVector);
             }
+
+            addHeaderAndMarkerInfo(rootSectionMetadata, headerFile, markerFile);
         } catch (Exception e) {
             logger.error("Exception occurred while setting metadata in hdf5 file "+e);
             throw new RuntimeException("context",e);
         }
 
+    }
+
+    public void addHeaderAndMarkerInfo(Section parentSection, String headerFile, String markerFile){
+        List<ChannelInfo> channelInfo = getChannelInfo(headerFile);
+        setChannelInfo(parentSection, channelInfo);
+
+        HashMap<String, EEGMarker> markerInfo = getMarkerInfo(markerFile);
+        setMarkerInfo(parentSection, markerInfo);
+    }
+
+    public void setChannelInfo( Section parentSection, List<ChannelInfo> channelInfo){
+        Section channelSection = parentSection.createSection("Channel Infos", "Channel");
+        Iterator itr = channelInfo.iterator();
+        int i=0;
+        while(itr.hasNext()){
+            i++;
+
+            ChannelInfo channelInfoItem = (ChannelInfo)itr.next();
+            Section channelItemSection = channelSection.createSection("Channel"+channelInfoItem.getNumber(), "Channel");
+
+            Value channelNumber = new Value("");
+            channelNumber.setInt(channelInfoItem.getNumber());
+            channelItemSection.createProperty("Number", channelNumber);
+
+            Value channelName = new Value("");
+            channelName.setString(channelInfoItem.getName());
+            channelItemSection.createProperty("Name", channelName);
+
+            Value channelUnits = new Value("");
+            channelUnits.setString(channelInfoItem.getUnits());
+            channelItemSection.createProperty("Units", channelUnits);
+
+            Value channelResolution = new Value("");
+            channelResolution.setDouble(channelInfoItem.getResolution());
+            channelItemSection.createProperty("Resolution", channelResolution);
+
+            System.out.println(i+" Channel: "+channelInfoItem.getNumber()+" "+ channelInfoItem.getName()+" "+channelInfoItem.getUnits()+" "+channelInfoItem.getResolution());
+        }
+    }
+
+    public void setMarkerInfo(Section parentSection, HashMap<String, EEGMarker> markerInfo){
+        Section markerSection = parentSection.createSection("Marker Infos", "Marker");
+        System.out.println("\nMarkers Info: ");
+
+        Iterator markerItr = markerInfo.entrySet().iterator();
+        int i=0;
+
+        Set<String> markerKey = markerInfo.keySet();
+
+        Iterator keyitr = markerKey.iterator();
+        int j=0;
+
+        while(markerItr.hasNext() && keyitr.hasNext()){
+            i++;
+            String key = keyitr.next().toString();
+            EEGMarker markerItem = markerInfo.get(key);
+
+            Section markerItemSection = markerSection.createSection(key, "Marker");
+
+            Value markerName = new Value("");
+            markerName.setString(markerItem.getName());
+            markerItemSection.createProperty("Name", markerName);
+
+            Value markerPosition = new Value("");
+            markerPosition.setInt(markerItem.getPosition());
+            markerItemSection.createProperty("Position", markerPosition);
+
+            Value markerStimulus = new Value("");
+            markerStimulus.setString(markerItem.getName());
+            markerItemSection.createProperty("Stimulus", markerStimulus);
+
+            System.out.println(i+" Marker: "+ markerItem.getName()+" "+markerItem.getPosition()+" "+markerItem.getStimulus());
+        }
     }
 
     public void setSection(Section parentSection, Vector<odml.core.Section> sectionVector){
@@ -131,7 +211,6 @@ public class MetadataParserImpl implements MetadataParser {
                     nameOfProperty = thisProperty.getName();
                 }
 
-
                 //System.out.println("-----------type: "+ thisProperty.getWholeValue().getMap().get("type") + " | value " + thisProperty.getValue());
                 if(thisProperty.valueCount()>0){
                     odml.core.Value wholeValue = thisProperty.getWholeValue();
@@ -167,10 +246,52 @@ public class MetadataParserImpl implements MetadataParser {
         }
     }
 
-//    public void setGUINamespace(String nameOfGUINamespace, Boolean valueOfGUINamespace, Section guiSection){
-//        Value gui_required_value = new Value(valueOfGUINamespace);
-//        guiSection.createProperty(nameOfGUINamespace, gui_required_value);
-//    }
+    public List<ChannelInfo> getChannelInfo(String vhdrFile){
+        byte[] inputHeaderFIle = convertToByteArray(vhdrFile);
+        VhdrReader vhdrReader = new VhdrReader();
+        vhdrReader.readVhdr(inputHeaderFIle);
+
+//        HashMap<String, HashMap<String, String>> properties = vhdrReader.getProperties();
+//        System.out.println("\nheader properties: "+ properties);
+
+        List<ChannelInfo> channelInfo = vhdrReader.getChannels();
+
+        return channelInfo;
+
+    }
+
+    public HashMap<String, EEGMarker> getMarkerInfo(String vmrkFile){
+        byte[] inputMarkerFIle = convertToByteArray(vmrkFile);
+        VhdrReader vhdrReader = new VhdrReader();
+        vhdrReader.readVmrk(inputMarkerFIle);
+        HashMap<String, EEGMarker> markers = vhdrReader.getMarkers();
+
+        return markers;
+
+    }
+
+    public byte[] convertToByteArray(String inputFile){
+        FileInputStream fileInputStream=null;
+
+        File file = new File(inputFile);
+
+        byte[] bFile = new byte[(int) file.length()];
+
+        try {
+            //convert file into array of bytes
+            fileInputStream = new FileInputStream(file);
+            fileInputStream.read(bFile);
+            fileInputStream.close();
+//            for (int i = 0; i < bFile.length; i++) {
+//                System.out.print((char)bFile[i]);
+//            }
+            System.out.println("File converted to Byte Array");
+        }catch(Exception e){
+            //TODO: handle exception
+            e.printStackTrace();
+        }
+        return bFile;
+    }
 
     public void processGUINamespaces(Section parentSec, odml.core.Property property){
         Section guiSection = parentSec.createSection(property.getName(), "GUI:Namespace");

@@ -17,6 +17,7 @@ public class ODMLParserImpl implements ODMLParser {
     private String metadataFile;
     private String dataFile;
     private String headerFile;
+    private String markerFile;
     final static Logger logger = Logger.getLogger(ODMLParserImpl.class);
 
     public ODMLParserImpl() {
@@ -31,11 +32,12 @@ public class ODMLParserImpl implements ODMLParser {
      * @param dataFile the .eeg or the .avg file which contains the raw eeg data
      * @param headerFile the corresponding header file (with the .vhdr extension) of the raw eeg data
      */
-    public ODMLParserImpl(String filename, String metadataFile, String dataFile, String headerFile) {
+    public ODMLParserImpl(String filename, String metadataFile, String dataFile, String headerFile, String markerFile) {
         this.filename = filename;
         this.metadataFile = metadataFile;
         this.dataFile = dataFile;
         this.headerFile = headerFile;
+        this.markerFile = markerFile;
     }
 
 
@@ -53,8 +55,8 @@ public class ODMLParserImpl implements ODMLParser {
             DataParserImpl dataParser  = new DataParserImpl(headerFile, dataFile);
             dataParser.setData(b);
 
-            //MetadataParserImpl metadataParser = new MetadataParserImpl();
-            //metadataParser.setMetadata( metadataFile, b, file);
+            MetadataParserImpl metadataParser = new MetadataParserImpl();
+            metadataParser.setMetadata( metadataFile, b, file, headerFile, markerFile);
 
             logger.info("done.");
 
