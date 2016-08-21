@@ -1,12 +1,8 @@
-//import core.MetadataCreator;
+package converter;//import core.MetadataCreator;
 import core.MetadataCreator;
-import core.MetadataParser;
-import odml.core.Reader;
 import odml.core.Writer;
-import odml.core.GUIHelper;
 import odml.core.Property;
 import odml.core.Section;
-import odml.core.Value;
 import org.apache.log4j.Logger;
 import org.g_node.nix.*;
 import org.g_node.nix.File;
@@ -16,7 +12,6 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 
 /**
@@ -28,6 +23,12 @@ public class MetadataCreatorImpl implements MetadataCreator{
     Map<Integer,String> dataTypeMap = new HashMap<>();
 
     final static Logger logger = Logger.getLogger(MetadataCreatorImpl.class);
+
+    /**
+     * The constructor which takes The HDF5 file to convert and intializes it.
+     * Also creates the data type mapping as in nix
+     * @param hdf5File : The HDF5 file to be converted
+     */
     public MetadataCreatorImpl(String hdf5File) {
         this.hd5File = hdf5File;
         //data type mapping as in nix
@@ -49,12 +50,15 @@ public class MetadataCreatorImpl implements MetadataCreator{
     }
 
     public File initializeHDF5Reader(){
-
         File file = File.open(hd5File, FileMode.ReadOnly);
         return file;
 
     }
 
+    /**
+     * It initiates and accomplishes the conversion of HDF5 file to metadata in odml and extracts raw data too
+     * @param odmlFileName : the name of the odml file to be created
+     */
     public void createOdml(String odmlFileName)  {
 
         File fileRead = initializeHDF5Reader();

@@ -1,7 +1,13 @@
+package converter;
+
 import org.apache.log4j.Logger;
 
 /**
  * Created by lion on 27/7/16.
+ */
+
+/**
+ * The main class which is used to test the conversion of HDF5 datset into metadata in odml format and data as double values for various channels
  */
 public class MainClassCreator {
     static Logger logger = Logger.getLogger(MainClassCreator.class.getName());

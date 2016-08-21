@@ -1,3 +1,5 @@
+package converter;
+
 import core.DataCreator;
 import org.apache.log4j.Logger;
 import org.g_node.nix.*;
@@ -13,14 +15,24 @@ public class DataCreatorImpl implements DataCreator {
     static Logger logger = Logger.getLogger(DataCreatorImpl.class.getName());
     String hd5File;
 
+    /**
+     * Default constructor, when no HDF5 file to convert is passed
+     */
     public DataCreatorImpl(){
         logger.debug("Invalid HDF5 File to read");
     }
 
+    /**
+     * The constructor initializes the name of the hdf5 file which is to be converted so as to extrat odml metadata, and data files with data as double values
+     * @param hdf5File : the hdf5 file which is to be converted to odml metadata and data
+     */
     public DataCreatorImpl(String hdf5File){
         this.hd5File = hdf5File;
     }
 
+    /**
+     * It uses the hdf5 file passed and extracts the metadata odml file, and extracts the raw data as double values for various channels
+     */
     public void writeDataFromHdfFile() {
         File file = File.open(hd5File, FileMode.ReadOnly);
         Block block = file.getBlock(0);
