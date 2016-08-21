@@ -1,7 +1,7 @@
 <component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="Converter:jar">
+  <artifact type="jar" name="Converter:jar">
     <output-path>$PROJECT_DIR$/classes/artifacts/Converter_jar</output-path>
-    <root id="archive" name="odML-HDF5-Converter.jar">
+    <root id="archive" name="Converter.jar">
       <element id="module-output" name="odML-HDF5-Converter" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/odml/core/odml/1.0/odml-1.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/cz/zcu/kiv/eeg/EEGLoader/2.2/EEGLoader-2.2.jar" path-in-jar="/" />
