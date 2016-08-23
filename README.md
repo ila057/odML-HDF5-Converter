@@ -20,4 +20,4 @@ The jar files required are : <br>
 8. joda-time-2.4.jar
 
 
-The total number of channels is taken as the default channel number. There is provision to change the default channel number, as shown in the MainClass.java (example usage).
+More information can be found at : https://gist.github.com/ila057/c60c70a152fb86e6f5f11230700dcd9c
