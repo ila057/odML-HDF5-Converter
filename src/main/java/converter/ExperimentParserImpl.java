@@ -1,6 +1,6 @@
 package converter;
 
-import core.ODMLParser;
+import core.ExperimentParser;
 import org.apache.log4j.Logger;
 import org.g_node.nix.*;
 
@@ -14,10 +14,10 @@ import java.io.IOException;
  * It then creates an HDF5 file with the corresponding metadata information and the raw data as values of double datatype.
  */
 
-public class ODMLParserImpl implements ODMLParser {
+public class ExperimentParserImpl implements ExperimentParser {
 
 
-    final static Logger logger = Logger.getLogger(ODMLParserImpl.class);
+    final static Logger logger = Logger.getLogger(ExperimentParserImpl.class);
 
 
     /**

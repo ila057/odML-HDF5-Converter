@@ -21,7 +21,6 @@
     <orderEntry type="library" name="Maven: odml.core:odml:1.0" level="project" />
     <orderEntry type="library" name="Maven: log4j:log4j:1.2.17" level="project" />
     <orderEntry type="library" name="Maven: org.gnode:nix-linux-x86_64:1.0" level="project" />
-    <orderEntry type="library" name="Maven: net.jcip:jcip-annotations:1.0" level="project" />
     <orderEntry type="library" name="Maven: cz.zcu.kiv.eeg:EEGLoader:2.2" level="project" />
   </component>
 </module>

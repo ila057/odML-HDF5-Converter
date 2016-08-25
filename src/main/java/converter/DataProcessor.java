@@ -1,6 +1,6 @@
 package converter;
 
-import core.ODMLParser;
+import core.ExperimentParser;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
@@ -129,13 +129,13 @@ public class DataProcessor {
                                 + rootFileName + ".vhdr\n>>>>"
                                 + rootFileName + ".vmrk");
 
-                        ODMLParser odmlParser = new ODMLParserImpl();
+                        ExperimentParser experimentParser = new ExperimentParserImpl();
                         boolean last = false;
                         if(i==datasetDirectories.length-1 && count == countOfEegAvgFiles){
                             last = true;
                         }
 
-                        odmlParser.parseODML(h5FileLocation + "/" + fileName.replace(".eeg", "") + ".h5",
+                        experimentParser.parseODML(h5FileLocation + "/" + fileName.replace(".eeg", "") + ".h5",
                                 datasetDirectories[i].getPath() + "/metadata.xml",
                                 rootFileName + ".eeg", rootFileName + ".vhdr",
                                 rootFileName + ".vmrk", last);
@@ -154,13 +154,13 @@ public class DataProcessor {
                                 + rootFileName + ".vhdr\n>>>>"
                                 + rootFileName + ".vmrk");
 
-                        ODMLParser odmlParser = new ODMLParserImpl();
+                        ExperimentParser experimentParser = new ExperimentParserImpl();
                         boolean last = false;
                         if(i==datasetDirectories.length-1 && count == countOfEegAvgFiles){
                             last = true;
                         }
 
-                        odmlParser.parseODML(h5FileLocation + "/" + fileName.replace(".avg", "") + ".h5",
+                        experimentParser.parseODML(h5FileLocation + "/" + fileName.replace(".avg", "") + ".h5",
                                 datasetDirectories[i].getPath() + "/metadata.xml",
                                 rootFileName + ".avg", rootFileName + ".vhdr",
                                 rootFileName + ".vmrk",last);
