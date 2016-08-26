@@ -1,7 +1,7 @@
 <component name="libraryTable">
-  <library name="nix-java">
+  <library name="nix-linux-x86_64">
     <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/nix-java.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/nix-linux-x86_64.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
