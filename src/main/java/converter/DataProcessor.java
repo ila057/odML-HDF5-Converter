@@ -4,7 +4,9 @@ import core.ExperimentParser;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
+import javax.xml.crypto.Data;
 import java.io.*;
+import java.util.ArrayList;
 
 /**
  * Created by ipsita on 17/8/16.
@@ -81,6 +83,30 @@ public class DataProcessor {
     }
 
     /**
+     * checks metadata exists in a particular datset of data-package
+     * @param currentDatasetDir : the list of all files in a dataset
+     * @return : returns true if metadata exists in a particular datset of data-package
+     */
+    public Boolean seeIfMetadataExists(java.io.File currentDatasetDir){
+        ArrayList<Boolean> metadataExists;
+        File [] currentDirectoryContents = getDirectoryContents(currentDatasetDir.getPath());
+        for(File file : currentDirectoryContents){
+            if(file.getName().equalsIgnoreCase("metadata.xml"))
+                return true;
+        }
+        return false;
+    }
+
+    public String getDataFolderPath(String datasetDirectoryPath){
+        String dataFolderPath=datasetDirectoryPath+"/Data";
+        java.io.File[] allContents = getDirectoryContents(dataFolderPath);
+        for(File file :allContents){
+            if(file.getName().equals("Data"))
+                dataFolderPath = file.getPath();
+        }
+        return dataFolderPath;
+    }
+    /**
      * The main method which takes the zip folder, derives the dataset files, and calls the parser to read them and convert each into HDF5 file
      * @param baseDataFolder : the base folder which is the entire data-package unzipped
      * @param datasetDirectories : the list of all the directories listed inside the data-package folder
@@ -88,22 +114,26 @@ public class DataProcessor {
     public void processAllDataSetsFinal(String baseDataFolder, java.io.File[] datasetDirectories){
         logger.info("====== STEP 2 - processAllDataSetsFinal =========");
         int countOfEegAvgFiles=0;
+        boolean metadataExists;
         int count=0;
         for(int i=0; i<datasetDirectories.length; i++){
             count = 0;
-            String currentExpDataFolderPath = datasetDirectories[i].getPath()+"/Data/";
+
+            //String currentExpDataFolderPath = datasetDirectories[i].getPath()+"/Data/";
+            String currentExpDataFolderPath = getDataFolderPath(datasetDirectories[i].getPath());
             logger.debug(">> i=" + i + ", currentExpDataFolderPath : " + currentExpDataFolderPath);
 
             findAndUnzipAnyZipInsideAndThenDeleteZip(currentExpDataFolderPath);
 
             java.io.File[] DataSetFiles = getDirectoryContents(currentExpDataFolderPath);
-
+            metadataExists = seeIfMetadataExists(datasetDirectories[i]);
             logger.debug("Going to create hdf5 files directory");
             java.io.File h5FileLocation = new java.io.File(datasetDirectories[i].getPath() + "/H5FileLocation");
             h5FileLocation.mkdir();
             logger.debug("h5FileLocation : " + h5FileLocation.getPath());
 
             countOfEegAvgFiles = countEegAvgFilesInDataSetFiles(DataSetFiles);
+
             logger.debug("Total eeg/avg files in this experiment: " + countOfEegAvgFiles);
             for(int j=0; j<DataSetFiles.length; j++){
                 if(DataSetFiles[j].isDirectory()){
@@ -138,7 +168,7 @@ public class DataProcessor {
                         experimentParser.parseODML(h5FileLocation + "/" + fileName.replace(".eeg", "") + ".h5",
                                 datasetDirectories[i].getPath() + "/metadata.xml",
                                 rootFileName + ".eeg", rootFileName + ".vhdr",
-                                rootFileName + ".vmrk", last);
+                                rootFileName + ".vmrk", last, metadataExists);
 
                     }
                     else if(DataSetFiles[j].getName().endsWith(".avg")){
@@ -163,7 +193,7 @@ public class DataProcessor {
                         experimentParser.parseODML(h5FileLocation + "/" + fileName.replace(".avg", "") + ".h5",
                                 datasetDirectories[i].getPath() + "/metadata.xml",
                                 rootFileName + ".avg", rootFileName + ".vhdr",
-                                rootFileName + ".vmrk",last);
+                                rootFileName + ".vmrk",last, metadataExists);
                     }
                 }
             }

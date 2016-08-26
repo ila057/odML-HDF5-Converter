@@ -55,34 +55,40 @@ public class MetadataParserImpl implements MetadataParser {
      * @param block : Block whose metadata will be set
      * @param file : HDF5 (Specifically nix) file in which this metadata will be written
      */
-    public void setMetadata(String metadataFile, Block block, org.g_node.nix.File file, String headerFile, String markerFile) throws IOException {
+    public void setMetadata(String metadataFile, Block block, org.g_node.nix.File file, String headerFile, String markerFile, boolean metadataExists) throws IOException {
         logger.info("entering setMetadata");
-
-        odml.core.Section rootSection = initializeODMLReader(metadataFile);
-        logger.info("rootSection initialized");
-
-        String version = rootSection.getDocumentVersion();
-        String date = rootSection.getDocumentDate().toString();
-
-        logger.info("version : " + version);
-        logger.info("date : " + date);
 
         // create section and add a property
         Section rootSectionMetadata = file.createSection("metadataSection", "metadata");
         block.setMetadata(rootSectionMetadata);
-        logger.info("metadata setting done.");
+        logger.info("created a metadataSection and added it to the block.");
 
-        //for parsing
-        Vector<odml.core.Section> sectionVector = rootSection.getSections();
+        if(metadataExists){
 
-        if(sectionVector.size()>0){
-            setSection(rootSectionMetadata, sectionVector);
+            odml.core.Section rootSection = initializeODMLReader(metadataFile);
+            logger.info("rootSection initialized");
+
+            String version = rootSection.getDocumentVersion();
+            String date = rootSection.getDocumentDate().toString();
+
+            logger.info("version : " + version);
+            logger.info("date : " + date);
+
+            //for parsing
+            Vector<odml.core.Section> sectionVector = rootSection.getSections();
+            if(sectionVector.size()>0){
+                setSection(rootSectionMetadata, sectionVector);
+            }
+        }
+        else{
+            logger.warn("no metadata.xml exists for this experiment.");
         }
 
         addHeaderAndMarkerInfo(rootSectionMetadata, headerFile, markerFile);
-        rootSectionMetadata.setNull();
+        logger.info("added header and marker file info");
 
-        logger.info("leaving setMetadata");
+        rootSectionMetadata.setNull();
+        logger.info("leaving setMetadata method");
 
     }
 
