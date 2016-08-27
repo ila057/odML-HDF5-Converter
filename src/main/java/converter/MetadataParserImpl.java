@@ -55,7 +55,7 @@ public class MetadataParserImpl implements MetadataParser {
      * @param block : Block whose metadata will be set
      * @param file : HDF5 (Specifically nix) file in which this metadata will be written
      */
-    public void setMetadata(String metadataFile, Block block, org.g_node.nix.File file, String headerFile, String markerFile, boolean metadataExists) throws IOException {
+    public void setMetadata(String metadataFile, Block block, org.g_node.nix.File file, String headerFile, String markerFile, boolean metadataExists, boolean vhdrExists, boolean vmrkExists) throws IOException {
         logger.info("entering setMetadata");
 
         // create section and add a property
@@ -84,7 +84,7 @@ public class MetadataParserImpl implements MetadataParser {
             logger.warn("no metadata.xml exists for this experiment.");
         }
 
-        addHeaderAndMarkerInfo(rootSectionMetadata, headerFile, markerFile);
+        addHeaderAndMarkerInfo(rootSectionMetadata, headerFile, markerFile, vhdrExists, vmrkExists);
         logger.info("added header and marker file info");
 
         rootSectionMetadata.setNull();
@@ -99,14 +99,18 @@ public class MetadataParserImpl implements MetadataParser {
      * @param markerFile : the marker file which contains marker info
      * @throws IOException
      */
-    public void addHeaderAndMarkerInfo(Section parentSection, String headerFile, String markerFile) throws IOException {
+    public void addHeaderAndMarkerInfo(Section parentSection, String headerFile, String markerFile, boolean vhdrExists, boolean vmrkExists) throws IOException {
         logger.info("entering addHeaderAndMarkerInfo");
 
-        List<ChannelInfo> channelInfo = getChannelInfo(headerFile);
-        setChannelInfo(parentSection, channelInfo);
+        if(vhdrExists) {
+            List<ChannelInfo> channelInfo = getChannelInfo(headerFile);
+            setChannelInfo(parentSection, channelInfo);
+        }
 
-        HashMap<String, EEGMarker> markerInfo = getMarkerInfo(markerFile);
-        setMarkerInfo(parentSection, markerInfo);
+        if(vmrkExists) {
+            HashMap<String, EEGMarker> markerInfo = getMarkerInfo(markerFile);
+            setMarkerInfo(parentSection, markerInfo);
+        }
         logger.info("leaving addHeaderAndMarkerInfo");
 
     }

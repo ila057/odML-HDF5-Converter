@@ -1,4 +1,5 @@
 package converter;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -16,7 +17,7 @@ public class MainClassParser {
             String finalConvertedFolderToBeZipped =
                     dataProcessor.
                             generateConvertedDataSet(
-                                    "/home/lion/incf/data/Readiness_Potential.zip");
+                                    "/home/lion/incf/data/Readiness_Potential/Readiness_Potential.zip");
 
 
         System.out.println("Done.");

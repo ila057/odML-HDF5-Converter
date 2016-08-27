@@ -97,8 +97,38 @@ public class DataProcessor {
         return false;
     }
 
+    /**
+     * checks header file exists in a particular datset of data-package
+     * @param currentDatasetDir : the list of all files in a dataset
+     * @return : returns true if header file exists in a particular datset of data-package
+     */
+    public Boolean checkIfVhdrExists(String currentDatasetDir){
+        File [] currentDirectoryContents = getDirectoryContents(currentDatasetDir);
+        for(File file : currentDirectoryContents){
+            if(file.getName().endsWith(".vhdr"))
+                return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * checks marker file exists in a particular datset of data-package
+     * @param currentDatasetDir : the list of all files in a dataset
+     * @return : returns true if marker file exists in a particular datset of data-package
+     */
+    public Boolean checkIfVmrkExists(String currentDatasetDir){
+        File [] currentDirectoryContents = getDirectoryContents(currentDatasetDir);
+        for(File file : currentDirectoryContents){
+            if(file.getName().endsWith(".vmrk"))
+                return true;
+        }
+        return false;
+    }
+
+
     public String getDataFolderPath(String datasetDirectoryPath){
-        String dataFolderPath=datasetDirectoryPath+"/Data";
+        String dataFolderPath=datasetDirectoryPath + "/Data";
         java.io.File[] allContents = getDirectoryContents(dataFolderPath);
         for(File file :allContents){
             if(file.getName().equals("Data"))
@@ -135,8 +165,11 @@ public class DataProcessor {
             countOfEegAvgFiles = countEegAvgFilesInDataSetFiles(DataSetFiles);
 
             logger.debug("Total eeg/avg files in this experiment: " + countOfEegAvgFiles);
-            for(int j=0; j<DataSetFiles.length; j++){
-                if(DataSetFiles[j].isDirectory()){
+            for (int j = 0; j < DataSetFiles.length; j++) {
+
+                Boolean vhdrExists;
+                Boolean vmrkExists;
+                if (DataSetFiles[j].isDirectory()) {
                     logger.debug("Current : " + DataSetFiles[j].getPath() + " -> Found it is a directory. Gonna remap DataSetFiles.");
                     DataSetFiles = getDirectoryContents(DataSetFiles[j].getPath());
                     countOfEegAvgFiles = countEegAvgFilesInDataSetFiles(DataSetFiles);
@@ -159,16 +192,19 @@ public class DataProcessor {
                                 + rootFileName + ".vhdr\n>>>>"
                                 + rootFileName + ".vmrk");
 
+                        vhdrExists = checkIfVhdrExists( DataSetFiles[j].getParent());
+                        vmrkExists = checkIfVmrkExists( DataSetFiles[j].getParent());
+
                         ExperimentParser experimentParser = new ExperimentParserImpl();
                         boolean last = false;
-                        if(i==datasetDirectories.length-1 && count == countOfEegAvgFiles){
+                        if (i == datasetDirectories.length - 1 && count == countOfEegAvgFiles) {
                             last = true;
                         }
 
                         experimentParser.parseODML(h5FileLocation + "/" + fileName.replace(".eeg", "") + ".h5",
                                 datasetDirectories[i].getPath() + "/metadata.xml",
                                 rootFileName + ".eeg", rootFileName + ".vhdr",
-                                rootFileName + ".vmrk", last, metadataExists);
+                                rootFileName + ".vmrk", last, metadataExists, vhdrExists, vmrkExists);
 
                     }
                     else if(DataSetFiles[j].getName().endsWith(".avg")){
@@ -184,6 +220,9 @@ public class DataProcessor {
                                 + rootFileName + ".vhdr\n>>>>"
                                 + rootFileName + ".vmrk");
 
+                        vhdrExists = checkIfVhdrExists( DataSetFiles[j].getParent());
+                        vmrkExists = checkIfVmrkExists( DataSetFiles[j].getParent());
+
                         ExperimentParser experimentParser = new ExperimentParserImpl();
                         boolean last = false;
                         if(i==datasetDirectories.length-1 && count == countOfEegAvgFiles){
@@ -193,7 +232,7 @@ public class DataProcessor {
                         experimentParser.parseODML(h5FileLocation + "/" + fileName.replace(".avg", "") + ".h5",
                                 datasetDirectories[i].getPath() + "/metadata.xml",
                                 rootFileName + ".avg", rootFileName + ".vhdr",
-                                rootFileName + ".vmrk",last, metadataExists);
+                                rootFileName + ".vmrk",last, metadataExists, vhdrExists, vmrkExists);
                     }
                 }
             }
