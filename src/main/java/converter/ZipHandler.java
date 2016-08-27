@@ -46,7 +46,8 @@ public class ZipHandler {
             }
 
             //get the zip file content
-            zis = new ZipInputStream(new FileInputStream(zipFileName));
+            FileInputStream fis = new FileInputStream(zipFileName);
+            zis = new ZipInputStream(fis);
             //get the zipped file list entry
             ZipEntry ze = zis.getNextEntry();
 
@@ -84,8 +85,10 @@ public class ZipHandler {
             throw new IllegalStateException("could not unzip",e);
         }
         finally {
-            zis.closeEntry();
-            zis.close();
+            if(zis!=null){
+                zis.closeEntry();
+                zis.close();
+            }
         }
         return tempFolder;
     }

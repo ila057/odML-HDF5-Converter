@@ -1,4 +1,5 @@
 package converter;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -13,10 +14,11 @@ public class MainClassParser {
     public static void main(String args[]) throws IOException {
 
         DataProcessor dataProcessor = new DataProcessor();
-        String finalConvertedFolderToBeZipped =
-                dataProcessor.
-                        generateConvertedDataSet(
-                                "EEG_ERP.zip");
+            String finalConvertedFolderToBeZipped =
+                    dataProcessor.
+                            generateConvertedDataSet(
+                                    "/home/lion/incf/data/Readiness_Potential/Readiness_Potential.zip");
+
 
         System.out.println("Done.");
 
