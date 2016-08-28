@@ -4,7 +4,6 @@ import core.ExperimentParser;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
-import javax.xml.crypto.Data;
 import java.io.*;
 import java.util.ArrayList;
 
@@ -201,7 +200,7 @@ public class DataProcessor {
                             last = true;
                         }
 
-                        experimentParser.parseODML(h5FileLocation + "/" + fileName.replace(".eeg", "") + ".h5",
+                        experimentParser.parseExperiment(h5FileLocation + "/" + fileName.replace(".eeg", "") + ".h5",
                                 datasetDirectories[i].getPath() + "/metadata.xml",
                                 rootFileName + ".eeg", rootFileName + ".vhdr",
                                 rootFileName + ".vmrk", last, metadataExists, vhdrExists, vmrkExists);
@@ -229,10 +228,10 @@ public class DataProcessor {
                             last = true;
                         }
 
-                        experimentParser.parseODML(h5FileLocation + "/" + fileName.replace(".avg", "") + ".h5",
+                        experimentParser.parseExperiment(h5FileLocation + "/" + fileName.replace(".avg", "") + ".h5",
                                 datasetDirectories[i].getPath() + "/metadata.xml",
                                 rootFileName + ".avg", rootFileName + ".vhdr",
-                                rootFileName + ".vmrk",last, metadataExists, vhdrExists, vmrkExists);
+                                rootFileName + ".vmrk", last, metadataExists, vhdrExists, vmrkExists);
                     }
                 }
             }
