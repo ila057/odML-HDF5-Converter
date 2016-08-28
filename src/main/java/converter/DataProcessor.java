@@ -29,7 +29,7 @@ public class DataProcessor {
                 File deleteZip = new File(baseDataFolder);
                 deleteZip.delete();
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("unable to unzip a zip file found",e);
             }
         else
             basePathToProcess = baseDataFolder;
@@ -61,7 +61,7 @@ public class DataProcessor {
                     try {
                         ZipHandler.unzipFile(toUnzip);
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        logger.error("unable to unzip file "+toUnzip,e);
                     }
                 }
             }
@@ -141,7 +141,7 @@ public class DataProcessor {
      * @param baseDataFolder : the base folder which is the entire data-package unzipped
      * @param datasetDirectories : the list of all the directories listed inside the data-package folder
      */
-    public void processAllDataSetsFinal(String baseDataFolder, java.io.File[] datasetDirectories){
+    public void processAllDataSetsFinal(String baseDataFolder, java.io.File[] datasetDirectories) throws Exception {
         logger.info("====== STEP 2 - processAllDataSetsFinal =========");
         int countOfEegAvgFiles=0;
         boolean metadataExists;
@@ -293,7 +293,7 @@ public class DataProcessor {
      * @return the folder name containing the datasets converted into HDF5 format
      * @throws IOException
      */
-    public String generateConvertedDataSet(String inputZipFile) throws IOException {
+    public String generateConvertedDataSet(String inputZipFile) throws Exception {
         logger.info("coming in generateConvertedDataSet");
         logger.info("====== STEP 1 - UNZIPPING FILES =======");
         String unzippedFolderName=ZipHandler.unzipFile(inputZipFile);

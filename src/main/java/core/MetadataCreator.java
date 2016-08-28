@@ -11,7 +11,7 @@ import java.util.Vector;
  */
 public interface MetadataCreator {
     public File initializeHDF5Reader();
-    public void createOdml(String odmlFileName);
+    public void createOdml(String odmlFileName) throws Exception;
 
 
 }

@@ -28,7 +28,7 @@ public class MetadataParserImpl implements MetadataParser {
      * @param metadataFile : the metadata odML file to read
      * @return : the rootSextion of the the odML file
      */
-    public odml.core.Section initializeODMLReader(String metadataFile){
+    public odml.core.Section initializeODMLReader(String metadataFile) throws Exception {
         logger.info("Entering initializeODMLReader");
         Reader reader = new Reader();
         odml.core.Section rootSection;
@@ -40,7 +40,7 @@ public class MetadataParserImpl implements MetadataParser {
         } catch (Exception e) {
             logger.error("Exception occurred while loading  and reading odML input file. Please check if correct metadata file is provided "+e);
             inputstream = null;
-            throw new RuntimeException("Exception occurred while loading  and reading odML input file. Please check if correct metadata file is provided ",e);
+            throw new Exception("Exception occurred while loading  and reading odML input file. Please check if correct metadata file is provided ",e);
         }
         logger.info("leaving initializeODMLReader");
         return rootSection;
@@ -55,7 +55,7 @@ public class MetadataParserImpl implements MetadataParser {
      * @param block : Block whose metadata will be set
      * @param file : HDF5 (Specifically nix) file in which this metadata will be written
      */
-    public void setMetadata(String metadataFile, Block block, org.g_node.nix.File file, String headerFile, String markerFile, boolean metadataExists, boolean vhdrExists, boolean vmrkExists) throws IOException {
+    public void setMetadata(String metadataFile, Block block, org.g_node.nix.File file, String headerFile, String markerFile, boolean metadataExists, boolean vhdrExists, boolean vmrkExists) throws Exception {
         logger.info("entering setMetadata");
 
         // create section and add a property
@@ -87,7 +87,7 @@ public class MetadataParserImpl implements MetadataParser {
         addHeaderAndMarkerInfo(rootSectionMetadata, headerFile, markerFile, vhdrExists, vmrkExists);
         logger.info("added header and marker file info");
 
-        rootSectionMetadata.setNull();
+        //rootSectionMetadata.setNull();
         logger.info("leaving setMetadata method");
 
     }
@@ -148,15 +148,15 @@ public class MetadataParserImpl implements MetadataParser {
             channelResolution.setDouble(channelInfoItem.getResolution());
             channelItemSection.createProperty("Resolution", channelResolution);
 
-            channelNumber.setNull();
-            channelName.setNull();
-            channelUnits.setNull();
-            channelResolution.setNull();
-            channelItemSection.setNull();
+//            channelNumber.setNull();
+//            channelName.setNull();
+//            channelUnits.setNull();
+//            channelResolution.setNull();
+//            channelItemSection.setNull();
 
             logger.info(i + " Channel: " + channelInfoItem.getNumber()+" "+ channelInfoItem.getName()+" "+channelInfoItem.getUnits()+" "+channelInfoItem.getResolution());
         }
-        channelSection.setNull();
+        //channelSection.setNull();
         logger.info("leaving setChannelInfo");
 
     }
@@ -272,7 +272,7 @@ public class MetadataParserImpl implements MetadataParser {
                 }
 
                 //logger.info("-----------type: "+ thisProperty.getWholeValue().getMap().get("type") + " | value " + thisProperty.getValue());
-                if(thisProperty.valueCount()>0){
+                if(thisProperty!=null && thisProperty.getValue()!=null && thisProperty.getWholeValue()!=null && thisProperty.valueCount()>0){
                     odml.core.Value wholeValue = thisProperty.getWholeValue();
                     String value = thisProperty.getValue().toString();
                     String valueType= wholeValue.getMap().get("type").toString();
@@ -390,9 +390,9 @@ public class MetadataParserImpl implements MetadataParser {
 
             Value value = new Value(elementValue);
             guiSection.createProperty(elementName, value);
-            value.setNull();
+            //value.setNull();
         }
-        guiSection.setNull();
+        //guiSection.setNull();
         logger.info("leaving processGUINamespaces");
 
     }

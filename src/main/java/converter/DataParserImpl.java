@@ -44,7 +44,7 @@ public class DataParserImpl implements DataParser{
      *
      * @return A double array containing the experiment values
      */
-    public double[] convertBinaryData(DataTransformer dataTransformer, int size){
+    public double[] convertBinaryData(DataTransformer dataTransformer, int size) throws IOException {
         logger.info("entering convertBinaryData");
 
 
@@ -52,15 +52,15 @@ public class DataParserImpl implements DataParser{
         try {
             convertedBinaryData = dataTransformer.readBinaryData(headerFile, dataFile, size, ByteOrder.BIG_ENDIAN);
         } catch (IOException e) {
-            logger.error("Could not convert binary data successfully : ",e);
-            throw new RuntimeException("failed in reading Binary Data",e);
+            logger.error("Could not read and convert binary data : ",e);
+            throw new IOException("Could not read and convert binary data",e);
         }
         logger.info("leaving convertBinaryData");
 
         return convertedBinaryData;
     }
 
-    public int getNumberOfChannels(Block block, DataTransformer dataTransformer){
+    public int getNumberOfChannels(Block block, DataTransformer dataTransformer) throws IOException {
         logger.info("entering getNumberOfChannels");
 
         List channelInfo = new ArrayList<>();
@@ -69,7 +69,7 @@ public class DataParserImpl implements DataParser{
             channelInfo = dataTransformer.getChannelInfo(headerFile);
         } catch (IOException e) {
             logger.error("Could not get number of channels successfully : ",e);
-            throw new RuntimeException("Could not get number of channels successfully : ",e);
+            throw new IOException("Could not get number of channels successfully",e);
         }
         logger.info("leaving getNumberOfChannels");
 
@@ -83,7 +83,7 @@ public class DataParserImpl implements DataParser{
      *
      * @param b : Block of the nix file which will contain the data
      */
-    public void setData(Block b){
+    public void setData(Block b) throws IOException {
         logger.info("entering setData");
         DataTransformer dt = new EEGDataTransformer();
         int noOfChannels = getNumberOfChannels(b, dt);

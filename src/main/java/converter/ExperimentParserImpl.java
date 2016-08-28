@@ -23,7 +23,7 @@ public class ExperimentParserImpl implements ExperimentParser {
     /**
      *  The function calls the converter.DataParserImpl and the converter.MetadataParserImpl to set the raw data and metadata in the HDF5 file
      */
-    public void parseODML( String convertedFilename,String metadataFile,String dataFile,String headerFile,String markerFile, boolean last, boolean metadataExists, boolean vhdrExists, boolean vmrkExists){
+    public void parseODML( String convertedFilename,String metadataFile,String dataFile,String headerFile,String markerFile, boolean last, boolean metadataExists, boolean vhdrExists, boolean vmrkExists) throws Exception {
         logger.info("create hdf5 file and create a new file overwriting any existing content");
         org.g_node.nix.File nixFile = org.g_node.nix.File.open(convertedFilename, FileMode.ReadWrite);
 
@@ -34,7 +34,7 @@ public class ExperimentParserImpl implements ExperimentParser {
             metadataParser.setMetadata( metadataFile, b, nixFile, headerFile, markerFile, metadataExists, vhdrExists, vmrkExists);
         } catch (IOException e) {
             logger.error("could not set metadata. Parsing metadata failed.",e);
-            throw new RuntimeException("could not set metadata, parsing metadata failed.",e);
+            throw new IOException("could not set metadata, parsing metadata failed.",e);
         }
 
 

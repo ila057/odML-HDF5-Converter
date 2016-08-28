@@ -59,7 +59,7 @@ public class MetadataCreatorImpl implements MetadataCreator{
      * It initiates and accomplishes the conversion of HDF5 file to metadata in odml and extracts raw data too
      * @param odmlFileName : the name of the odml file to be created
      */
-    public void createOdml(String odmlFileName)  {
+    public void createOdml(String odmlFileName) throws Exception {
 
         File fileRead = initializeHDF5Reader();
         logger.debug(fileRead.getBlockCount() + " | " + fileRead.getBlock(0).getName() + " | " + fileRead.getSectionCount() + " | "+fileRead.getSection(0));
@@ -128,8 +128,8 @@ public class MetadataCreatorImpl implements MetadataCreator{
 
                         }
                     } catch (Exception e) {
-                        logger.error("IO Exception occurred while creating properties of odML metadata" + e);
-                        throw new RuntimeException("context",e);
+                        logger.error("Exception occurred while creating properties of odML metadata",e);
+                        throw new Exception("Exception occurred while creating properties of odML metadata",e);
                     }
 
                 }
@@ -139,7 +139,7 @@ public class MetadataCreatorImpl implements MetadataCreator{
             writer.write(outputstream);
         }catch (IOException e){
             logger.error("IO Exception occurred while creating odML metadata"+e);
-            throw new RuntimeException("context",e);
+            throw new IOException("IO Exception occurred while creating odML metadata",e);
         }
 
     }

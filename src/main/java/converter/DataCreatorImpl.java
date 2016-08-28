@@ -33,7 +33,7 @@ public class DataCreatorImpl implements DataCreator {
     /**
      * It uses the hdf5 file passed and extracts the metadata odml file, and extracts the raw data as double values for various channels
      */
-    public void writeDataFromHdfFile() {
+    public void writeDataFromHdfFile() throws FileNotFoundException {
         File file = File.open(hd5File, FileMode.ReadOnly);
         Block block = file.getBlock(0);
         List<DataArray> dataArrays = block.getDataArrays();
@@ -48,9 +48,9 @@ public class DataCreatorImpl implements DataCreator {
                     out.println(da);
                 }
                 out.close();
-            }catch(Exception e){
-                logger.error("Exception while extracting data from HDF5 file : "+e);
-                throw new RuntimeException("context",e);
+            }catch(FileNotFoundException e){
+                logger.error("Could not find/open file  : "+hd5File,e);
+                throw new FileNotFoundException("Could not find/open file : "+hd5File);
             }
         }
 

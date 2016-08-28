@@ -21,7 +21,7 @@ public class ZipHandler {
         try {
             ZipHandler.zipDir(finalConvertedFolderToBeZipped+"_h5.zip",finalConvertedFolderToBeZipped);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("unable to zip final converted folder",e);
         }
     }
 
@@ -102,7 +102,7 @@ public class ZipHandler {
     public static void zipDir(String zipFileName, String dir) throws IOException {
         File dirObj = new File(dir);
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(zipFileName));
-        System.out.println("Creating : " + zipFileName);
+        logger.info("Creating : " + zipFileName);
         addDir(dirObj, out);
         out.close();
     }
@@ -123,7 +123,7 @@ public class ZipHandler {
                 continue;
             }
             FileInputStream in = new FileInputStream(files[i].getPath());
-            System.out.println(" Adding: " + files[i].getPath());
+            logger.info(" Adding: " + files[i].getPath());
             out.putNextEntry(new ZipEntry(files[i].getPath()));
             int len;
             while ((len = in.read(tmpBuf)) > 0) {
