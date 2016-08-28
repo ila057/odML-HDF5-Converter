@@ -31,7 +31,9 @@ public class ExperimentParserImpl implements ExperimentParser {
 
         MetadataParserImpl metadataParser = new MetadataParserImpl();
         try {
-            metadataParser.setMetadata( metadataFile, b, nixFile, headerFile, markerFile, metadataExists, vhdrExists, vmrkExists);
+            if(b!=null) {
+                metadataParser.setMetadata(metadataFile, b, nixFile, headerFile, markerFile, metadataExists, vhdrExists, vmrkExists);
+            }
         } catch (IOException e) {
             logger.error("could not set metadata. Parsing metadata failed.",e);
             throw new IOException("could not set metadata, parsing metadata failed.",e);
@@ -40,7 +42,9 @@ public class ExperimentParserImpl implements ExperimentParser {
 
         if(vhdrExists) {
             DataParserImpl dataParser = new DataParserImpl(headerFile, dataFile);
-            dataParser.setData(b);
+            if(b!=null) {
+                dataParser.setData(b);
+            }
         }
 
         logger.info("done.");

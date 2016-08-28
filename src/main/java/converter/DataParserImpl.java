@@ -46,8 +46,6 @@ public class DataParserImpl implements DataParser{
      */
     public double[] convertBinaryData(DataTransformer dataTransformer, int size) throws IOException {
         logger.info("entering convertBinaryData");
-
-
         double[] convertedBinaryData = null;
         try {
             convertedBinaryData = dataTransformer.readBinaryData(headerFile, dataFile, size, ByteOrder.BIG_ENDIAN);
@@ -73,7 +71,10 @@ public class DataParserImpl implements DataParser{
         }
         logger.info("leaving getNumberOfChannels");
 
-        return channelInfo.size();
+        if(channelInfo!=null)
+            return channelInfo.size();
+        else
+            return 0;
     }
 
     /**
@@ -86,15 +87,19 @@ public class DataParserImpl implements DataParser{
     public void setData(Block b) throws IOException {
         logger.info("entering setData");
         DataTransformer dt = new EEGDataTransformer();
-        int noOfChannels = getNumberOfChannels(b, dt);
-        for(int i=1; i<noOfChannels+1; i++) {
-            double[] convertedBinaryData = convertBinaryData(dt, i);
-            int sizeOfData = convertedBinaryData.length;
-            logger.info("Gonna try to create a data array with these args : "+findNameOfDataArray()+i+","+"DataArray"+i+","+DataType.Double+","+"4th ND Size argument");
-            DataArray dataArray = b.createDataArray(findNameOfDataArray()+i, "DataArray"+i, DataType.Double, new NDSize(new int[]{sizeOfData}));
-            dataArray.setData(convertedBinaryData, new NDSize(new int[]{sizeOfData}), new NDSize(new int[]{0}));
-            logger.debug("Block's name: "+b.getName()+",   Block's DataArray Count:  "+b.getDataArrayCount());
-            dataArray.setNull();
+        Integer noOfChannels = getNumberOfChannels(b, dt);
+        if(noOfChannels!=null) {
+            for (int i = 1; i < noOfChannels + 1; i++) {
+                double[] convertedBinaryData = convertBinaryData(dt, i);
+                if(convertedBinaryData!=null) {
+                    int sizeOfData = convertedBinaryData.length;
+                    logger.info("Gonna try to create a data array with these args : " + findNameOfDataArray() + i + "," + "DataArray" + i + "," + DataType.Double + "," + "4th ND Size argument");
+                    DataArray dataArray = b.createDataArray(findNameOfDataArray() + i, "DataArray" + i, DataType.Double, new NDSize(new int[]{sizeOfData}));
+                    dataArray.setData(convertedBinaryData, new NDSize(new int[]{sizeOfData}), new NDSize(new int[]{0}));
+                    logger.debug("Block's name: " + b.getName() + ",   Block's DataArray Count:  " + b.getDataArrayCount());
+                    dataArray.setNull();
+                }
+            }
         }
         logger.info("leaving setData");
     }

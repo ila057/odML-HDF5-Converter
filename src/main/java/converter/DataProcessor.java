@@ -4,8 +4,8 @@ import core.ExperimentParser;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
+import javax.xml.crypto.Data;
 import java.io.*;
-import java.util.ArrayList;
 
 /**
  * Created by ipsita on 17/8/16.
@@ -74,9 +74,11 @@ public class DataProcessor {
      */
     public int countEegAvgFilesInDataSetFiles(java.io.File[] DataSetFiles){
         int count = 0;
-        for(File file : DataSetFiles){
-            if(file.getName().endsWith("eeg") || file.getName().endsWith("avg"))
-                count++;
+        if(DataSetFiles!=null) {
+            for (File file : DataSetFiles) {
+                if (file.getName().endsWith("eeg") || file.getName().endsWith("avg"))
+                    count++;
+            }
         }
         return count;
     }
@@ -86,12 +88,13 @@ public class DataProcessor {
      * @param currentDatasetDir : the list of all files in a dataset
      * @return : returns true if metadata exists in a particular datset of data-package
      */
-    public Boolean seeIfMetadataExists(java.io.File currentDatasetDir){
-        ArrayList<Boolean> metadataExists;
+    public Boolean checkIfMetadataExists(java.io.File currentDatasetDir){
         File [] currentDirectoryContents = getDirectoryContents(currentDatasetDir.getPath());
-        for(File file : currentDirectoryContents){
-            if(file.getName().equalsIgnoreCase("metadata.xml"))
-                return true;
+        if(currentDirectoryContents!=null) {
+            for (File file : currentDirectoryContents) {
+                if (file.getName().equalsIgnoreCase("metadata.xml"))
+                    return true;
+            }
         }
         return false;
     }
@@ -103,9 +106,11 @@ public class DataProcessor {
      */
     public Boolean checkIfVhdrExists(String currentDatasetDir){
         File [] currentDirectoryContents = getDirectoryContents(currentDatasetDir);
-        for(File file : currentDirectoryContents){
-            if(file.getName().endsWith(".vhdr"))
-                return true;
+        if(currentDirectoryContents!=null) {
+            for (File file : currentDirectoryContents) {
+                if (file.getName().endsWith(".vhdr"))
+                    return true;
+            }
         }
         return false;
     }
@@ -118,9 +123,11 @@ public class DataProcessor {
      */
     public Boolean checkIfVmrkExists(String currentDatasetDir){
         File [] currentDirectoryContents = getDirectoryContents(currentDatasetDir);
-        for(File file : currentDirectoryContents){
-            if(file.getName().endsWith(".vmrk"))
-                return true;
+        if(currentDirectoryContents!=null) {
+            for (File file : currentDirectoryContents) {
+                if (file.getName().endsWith(".vmrk"))
+                    return true;
+            }
         }
         return false;
     }
@@ -129,118 +136,121 @@ public class DataProcessor {
     public String getDataFolderPath(String datasetDirectoryPath){
         String dataFolderPath=datasetDirectoryPath + "/Data";
         java.io.File[] allContents = getDirectoryContents(dataFolderPath);
-        for(File file :allContents){
-            if(file.getName().equals("Data"))
-                dataFolderPath = file.getPath();
+        if(allContents!=null) {
+            for (File file : allContents) {
+                if (file.getName().equals("Data"))
+                    dataFolderPath = file.getPath();
+            }
         }
         return dataFolderPath;
     }
     /**
      * The main method which takes the zip folder, derives the dataset files, and calls the parser to read them and convert each into HDF5 file
-     * @param baseDataFolder : the base folder which is the entire data-package unzipped
      * @param datasetDirectories : the list of all the directories listed inside the data-package folder
      */
-    public void processAllDataSetsFinal(String baseDataFolder, java.io.File[] datasetDirectories) throws Exception {
+    public void processAllDataSetsFinal(File[] datasetDirectories) throws Exception {
         logger.info("====== STEP 2 - processAllDataSetsFinal =========");
         int countOfEegAvgFiles=0;
         boolean metadataExists;
         int count=0;
-        for(int i=0; i<datasetDirectories.length; i++){
-            count = 0;
+        if(datasetDirectories!=null) {
+            for (int i = 0; i < datasetDirectories.length; i++) {
+                count = 0;
 
-            //String currentExpDataFolderPath = datasetDirectories[i].getPath()+"/Data/";
-            String currentExpDataFolderPath = getDataFolderPath(datasetDirectories[i].getPath());
-            logger.debug(">> i=" + i + ", currentExpDataFolderPath : " + currentExpDataFolderPath);
+                //String currentExpDataFolderPath = datasetDirectories[i].getPath()+"/Data/";
+                String currentExpDataFolderPath = getDataFolderPath(datasetDirectories[i].getPath());
+                logger.debug(">> i=" + i + ", currentExpDataFolderPath : " + currentExpDataFolderPath);
 
-            findAndUnzipAnyZipInsideAndThenDeleteZip(currentExpDataFolderPath);
+                findAndUnzipAnyZipInsideAndThenDeleteZip(currentExpDataFolderPath);
 
-            java.io.File[] DataSetFiles = getDirectoryContents(currentExpDataFolderPath);
-            metadataExists = seeIfMetadataExists(datasetDirectories[i]);
-            logger.debug("Going to create hdf5 files directory");
-            java.io.File h5FileLocation = new java.io.File(datasetDirectories[i].getPath() + "/H5FileLocation");
-            h5FileLocation.mkdir();
-            logger.debug("h5FileLocation : " + h5FileLocation.getPath());
+                java.io.File[] DataSetFiles = getDirectoryContents(currentExpDataFolderPath);
+                metadataExists = checkIfMetadataExists(datasetDirectories[i]);
+                logger.debug("Going to create hdf5 files directory");
+                java.io.File h5FileLocation = new java.io.File(datasetDirectories[i].getPath() + "/H5FileLocation");
+                h5FileLocation.mkdir();
+                logger.debug("h5FileLocation : " + h5FileLocation.getPath());
 
-            countOfEegAvgFiles = countEegAvgFilesInDataSetFiles(DataSetFiles);
+                countOfEegAvgFiles = countEegAvgFilesInDataSetFiles(DataSetFiles);
 
-            logger.debug("Total eeg/avg files in this experiment: " + countOfEegAvgFiles);
-            for (int j = 0; j < DataSetFiles.length; j++) {
+                logger.debug("Total eeg/avg files in this experiment: " + countOfEegAvgFiles);
+                if(DataSetFiles!=null) {
+                    for (int j = 0; j < DataSetFiles.length; j++) {
 
-                Boolean vhdrExists;
-                Boolean vmrkExists;
-                if (DataSetFiles[j].isDirectory()) {
-                    logger.debug("Current : " + DataSetFiles[j].getPath() + " -> Found it is a directory. Gonna remap DataSetFiles.");
-                    DataSetFiles = getDirectoryContents(DataSetFiles[j].getPath());
-                    countOfEegAvgFiles = countEegAvgFilesInDataSetFiles(DataSetFiles);
-                    logger.debug("UPDATED > Total eeg/avg files in this experiment: "+countOfEegAvgFiles);
-                    j = -1;
-                    continue;
-                }
-                else{
-                    logger.debug("current file -> " + DataSetFiles[j].getName());
-                    if(DataSetFiles[j].getName().endsWith(".eeg")){
-                        count++;
+                        Boolean vhdrExists;
+                        Boolean vmrkExists;
+                        if (DataSetFiles[j].isDirectory()) {
+                            logger.debug("Current : " + DataSetFiles[j].getPath() + " -> Found it is a directory. Gonna remap DataSetFiles.");
+                            DataSetFiles = getDirectoryContents(DataSetFiles[j].getPath());
+                            countOfEegAvgFiles = countEegAvgFilesInDataSetFiles(DataSetFiles);
+                            logger.debug("UPDATED > Total eeg/avg files in this experiment: " + countOfEegAvgFiles);
+                            j = -1;
+                            continue;
+                        } else {
+                            logger.debug("current file -> " + DataSetFiles[j].getName());
+                            if (DataSetFiles[j].getName().endsWith(".eeg")) {
+                                count++;
 
-                        String rootFileName = DataSetFiles[j].getPath().replace(".eeg", "");
-                        logger.debug("rootFileName : " + rootFileName);
+                                String rootFileName = DataSetFiles[j].getPath().replace(".eeg", "");
+                                logger.debug("rootFileName : " + rootFileName);
 
-                        String fileName = FilenameUtils.getBaseName(rootFileName);
-                        logger.debug("Four Parameters gonna pass : " + "\n>>>>" + h5FileLocation + "/" + fileName.replace(".eeg", "") + ".h5 \n>>>>"
-                                + datasetDirectories[i].getPath() + "/metadata.xml \n>>>>"
-                                + rootFileName + ".eeg\n>>>>"
-                                + rootFileName + ".vhdr\n>>>>"
-                                + rootFileName + ".vmrk");
+                                String fileName = FilenameUtils.getBaseName(rootFileName);
+                                logger.debug("Four Parameters gonna pass : " + "\n>>>>" + h5FileLocation + "/" + fileName.replace(".eeg", "") + ".h5 \n>>>>"
+                                        + datasetDirectories[i].getPath() + "/metadata.xml \n>>>>"
+                                        + rootFileName + ".eeg\n>>>>"
+                                        + rootFileName + ".vhdr\n>>>>"
+                                        + rootFileName + ".vmrk");
 
-                        vhdrExists = checkIfVhdrExists( DataSetFiles[j].getParent());
-                        vmrkExists = checkIfVmrkExists( DataSetFiles[j].getParent());
+                                vhdrExists = checkIfVhdrExists(DataSetFiles[j].getParent());
+                                vmrkExists = checkIfVmrkExists(DataSetFiles[j].getParent());
 
-                        ExperimentParser experimentParser = new ExperimentParserImpl();
-                        boolean last = false;
-                        if (i == datasetDirectories.length - 1 && count == countOfEegAvgFiles) {
-                            last = true;
+                                ExperimentParser experimentParser = new ExperimentParserImpl();
+                                boolean last = false;
+                                if (i == datasetDirectories.length - 1 && count == countOfEegAvgFiles) {
+                                    last = true;
+                                }
+
+                                experimentParser.parseExperiment(h5FileLocation + "/" + fileName.replace(".eeg", "") + ".h5",
+                                        datasetDirectories[i].getPath() + "/metadata.xml",
+                                        rootFileName + ".eeg", rootFileName + ".vhdr",
+                                        rootFileName + ".vmrk", last, metadataExists, vhdrExists, vmrkExists);
+
+                            } else if (DataSetFiles[j].getName().endsWith(".avg")) {
+                                count++;
+
+                                String rootFileName = DataSetFiles[j].getPath().replace(".avg", "");
+                                logger.debug("rootFileName : " + rootFileName);
+
+                                String fileName = FilenameUtils.getBaseName(rootFileName);
+                                logger.debug("Four Parameters : " + "\n>>>>" + h5FileLocation + "/" + fileName.replace(".avg", "") + ".h5 \n>>>>"
+                                        + datasetDirectories[i].getPath() + "/metadata.xml \n>>>>"
+                                        + rootFileName + ".avg\n>>>>"
+                                        + rootFileName + ".vhdr\n>>>>"
+                                        + rootFileName + ".vmrk");
+
+                                vhdrExists = checkIfVhdrExists(DataSetFiles[j].getParent());
+                                vmrkExists = checkIfVmrkExists(DataSetFiles[j].getParent());
+
+                                ExperimentParser experimentParser = new ExperimentParserImpl();
+                                boolean last = false;
+                                if (i == datasetDirectories.length - 1 && count == countOfEegAvgFiles) {
+                                    last = true;
+                                }
+
+                                experimentParser.parseExperiment(h5FileLocation + "/" + fileName.replace(".avg", "") + ".h5",
+                                        datasetDirectories[i].getPath() + "/metadata.xml",
+                                        rootFileName + ".avg", rootFileName + ".vhdr",
+                                        rootFileName + ".vmrk", last, metadataExists, vhdrExists, vmrkExists);
+                            }
                         }
-
-                        experimentParser.parseExperiment(h5FileLocation + "/" + fileName.replace(".eeg", "") + ".h5",
-                                datasetDirectories[i].getPath() + "/metadata.xml",
-                                rootFileName + ".eeg", rootFileName + ".vhdr",
-                                rootFileName + ".vmrk", last, metadataExists, vhdrExists, vmrkExists);
-
-                    }
-                    else if(DataSetFiles[j].getName().endsWith(".avg")){
-                        count++;
-
-                        String rootFileName = DataSetFiles[j].getPath().replace(".avg", "");
-                        logger.debug("rootFileName : " + rootFileName);
-
-                        String fileName = FilenameUtils.getBaseName(rootFileName);
-                        logger.debug("Four Parameters : " + "\n>>>>" + h5FileLocation + "/" + fileName.replace(".avg", "") + ".h5 \n>>>>"
-                                + datasetDirectories[i].getPath() + "/metadata.xml \n>>>>"
-                                + rootFileName + ".avg\n>>>>"
-                                + rootFileName + ".vhdr\n>>>>"
-                                + rootFileName + ".vmrk");
-
-                        vhdrExists = checkIfVhdrExists( DataSetFiles[j].getParent());
-                        vmrkExists = checkIfVmrkExists( DataSetFiles[j].getParent());
-
-                        ExperimentParser experimentParser = new ExperimentParserImpl();
-                        boolean last = false;
-                        if(i==datasetDirectories.length-1 && count == countOfEegAvgFiles){
-                            last = true;
-                        }
-
-                        experimentParser.parseExperiment(h5FileLocation + "/" + fileName.replace(".avg", "") + ".h5",
-                                datasetDirectories[i].getPath() + "/metadata.xml",
-                                rootFileName + ".avg", rootFileName + ".vhdr",
-                                rootFileName + ".vmrk", last, metadataExists, vhdrExists, vmrkExists);
                     }
                 }
+                logger.debug("deleting this metadata.xml -> " + datasetDirectories[i].getAbsolutePath() + "/metadata.xml");
+                java.io.File toDeleteFile = new java.io.File(datasetDirectories[i].getAbsolutePath() + "/metadata.xml");
+                toDeleteFile.delete();
+                logger.debug("Deleting files in folder : " + currentExpDataFolderPath);
+                deleteRedundantFiles(new java.io.File(currentExpDataFolderPath));
+                logger.info("====== STEP 2 done =========");
             }
-            logger.debug("deleting this metadata.xml -> " + datasetDirectories[i].getAbsolutePath() + "/metadata.xml");
-            java.io.File toDeleteFile = new java.io.File(datasetDirectories[i].getAbsolutePath()+"/metadata.xml");
-            toDeleteFile.delete();
-            logger.debug("Deleting files in folder : " + currentExpDataFolderPath);
-            deleteRedundantFiles(new java.io.File(currentExpDataFolderPath));
-            logger.info("====== STEP 2 done =========");
         }
     }
 
@@ -298,7 +308,7 @@ public class DataProcessor {
         String unzippedFolderName=ZipHandler.unzipFile(inputZipFile);
         logger.info("====== STEP 1 done =======");
         java.io.File[] datasetDirectories = getDataSetNames(unzippedFolderName);
-        processAllDataSetsFinal(unzippedFolderName, datasetDirectories);
+        processAllDataSetsFinal(datasetDirectories);
 
         return unzippedFolderName;
     }

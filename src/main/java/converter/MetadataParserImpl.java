@@ -68,16 +68,12 @@ public class MetadataParserImpl implements MetadataParser {
             odml.core.Section rootSection = initializeODMLReader(metadataFile);
             logger.info("rootSection initialized");
 
-            String version = rootSection.getDocumentVersion();
-            String date = rootSection.getDocumentDate().toString();
-
-            logger.info("version : " + version);
-            logger.info("date : " + date);
-
             //for parsing
-            Vector<odml.core.Section> sectionVector = rootSection.getSections();
-            if(sectionVector.size()>0){
-                setSection(rootSectionMetadata, sectionVector);
+            if(rootSection!=null) {
+                Vector<odml.core.Section> sectionVector = rootSection.getSections();
+                if (sectionVector != null && sectionVector.size() > 0) {
+                    setSection(rootSectionMetadata, sectionVector);
+                }
             }
         }
         else{
@@ -104,12 +100,14 @@ public class MetadataParserImpl implements MetadataParser {
 
         if(vhdrExists) {
             List<ChannelInfo> channelInfo = getChannelInfo(headerFile);
-            setChannelInfo(parentSection, channelInfo);
+            if(channelInfo!=null)
+                setChannelInfo(parentSection, channelInfo);
         }
 
         if(vmrkExists) {
             HashMap<String, EEGMarker> markerInfo = getMarkerInfo(markerFile);
-            setMarkerInfo(parentSection, markerInfo);
+            if(markerInfo!=null)
+                setMarkerInfo(parentSection, markerInfo);
         }
         logger.info("leaving addHeaderAndMarkerInfo");
 
@@ -122,31 +120,31 @@ public class MetadataParserImpl implements MetadataParser {
      */
     public void setChannelInfo( Section parentSection, List<ChannelInfo> channelInfo){
         logger.info("entering setChannelInfo");
+        if(parentSection!=null) {
+            Section channelSection = parentSection.createSection("Channel Infos", "Channel");
+            Iterator itr = channelInfo.iterator();
+            int i = 0;
+            while (itr.hasNext()) {
+                i++;
 
-        Section channelSection = parentSection.createSection("Channel Infos", "Channel");
-        Iterator itr = channelInfo.iterator();
-        int i=0;
-        while(itr.hasNext()){
-            i++;
+                ChannelInfo channelInfoItem = (ChannelInfo) itr.next();
+                Section channelItemSection = channelSection.createSection("Channel" + channelInfoItem.getNumber(), "Channel");
 
-            ChannelInfo channelInfoItem = (ChannelInfo)itr.next();
-            Section channelItemSection = channelSection.createSection("Channel"+channelInfoItem.getNumber(), "Channel");
+                Value channelNumber = new Value("");
+                channelNumber.setInt(channelInfoItem.getNumber());
+                channelItemSection.createProperty("Number", channelNumber);
 
-            Value channelNumber = new Value("");
-            channelNumber.setInt(channelInfoItem.getNumber());
-            channelItemSection.createProperty("Number", channelNumber);
+                Value channelName = new Value("");
+                channelName.setString(channelInfoItem.getName());
+                channelItemSection.createProperty("Name", channelName);
 
-            Value channelName = new Value("");
-            channelName.setString(channelInfoItem.getName());
-            channelItemSection.createProperty("Name", channelName);
+                Value channelUnits = new Value("");
+                channelUnits.setString(channelInfoItem.getUnits());
+                channelItemSection.createProperty("Units", channelUnits);
 
-            Value channelUnits = new Value("");
-            channelUnits.setString(channelInfoItem.getUnits());
-            channelItemSection.createProperty("Units", channelUnits);
-
-            Value channelResolution = new Value("");
-            channelResolution.setDouble(channelInfoItem.getResolution());
-            channelItemSection.createProperty("Resolution", channelResolution);
+                Value channelResolution = new Value("");
+                channelResolution.setDouble(channelInfoItem.getResolution());
+                channelItemSection.createProperty("Resolution", channelResolution);
 
 //            channelNumber.setNull();
 //            channelName.setNull();
@@ -154,11 +152,11 @@ public class MetadataParserImpl implements MetadataParser {
 //            channelResolution.setNull();
 //            channelItemSection.setNull();
 
-            logger.info(i + " Channel: " + channelInfoItem.getNumber()+" "+ channelInfoItem.getName()+" "+channelInfoItem.getUnits()+" "+channelInfoItem.getResolution());
+                logger.info(i + " Channel: " + channelInfoItem.getNumber() + " " + channelInfoItem.getName() + " " + channelInfoItem.getUnits() + " " + channelInfoItem.getResolution());
+            }
+            //channelSection.setNull();
+            logger.info("leaving setChannelInfo");
         }
-        //channelSection.setNull();
-        logger.info("leaving setChannelInfo");
-
     }
 
     /**
@@ -217,35 +215,38 @@ public class MetadataParserImpl implements MetadataParser {
     public void setSection(Section parentSection, Vector<odml.core.Section> sectionVector){
         logger.info("entering setSection");
 
-        for (int currentSectionIndex = 0; currentSectionIndex < sectionVector.size(); currentSectionIndex++)
-        {
+        if(sectionVector!=null) {
+            for (int currentSectionIndex = 0; currentSectionIndex < sectionVector.size(); currentSectionIndex++) {
 
-            odml.core.Section thisSection = sectionVector.get(currentSectionIndex);
-            logger.debug("currentSectionIndex : " + currentSectionIndex + " | Current section name : " + thisSection.getName());
+                odml.core.Section thisSection = sectionVector.get(currentSectionIndex);
+                logger.debug("currentSectionIndex : " + currentSectionIndex + " | Current section name : " + thisSection.getName());
 
-            String typeOfSection = "";
-            String nameOfSection = "";
-            Vector<odml.core.Property> propertiesList = new Vector<>();
+                String typeOfSection = "";
+                String nameOfSection = "";
+                Vector<odml.core.Property> propertiesList = new Vector<>();
 
-            if(thisSection.getType()!=null){
-                typeOfSection = thisSection.getType();
+                if (thisSection.getType() != null) {
+                    typeOfSection = thisSection.getType();
+                }
+
+                if (thisSection.getName() != null) {
+                    nameOfSection = thisSection.getName();
+                }
+                // hdf5 creating subsection of metadata section (root)
+                Section secChild = parentSection.createSection(nameOfSection, typeOfSection);
+
+                //this is the recursive function since a section may have a section inside it, and so on.
+                if (thisSection.getSections() != null && thisSection.getSections().size() > 0) {
+                    setSection(secChild, thisSection.getSections());
+                }
+
+                if (thisSection.getProperties() != null) {
+                    propertiesList = thisSection.getProperties();
+                }
+                if(secChild!=null) {
+                    setProperties(secChild, propertiesList);
+                }
             }
-
-            if(thisSection.getName()!=null){
-                nameOfSection = thisSection.getName();
-            }
-            // hdf5 creating subsection of metadata section (root)
-            Section secChild = parentSection.createSection(nameOfSection, typeOfSection);
-
-            //this is the recursive function since a section may have a section inside it, and so on.
-            if(thisSection.getSections()!=null && thisSection.getSections().size()>0){
-                setSection(secChild, thisSection.getSections());
-            }
-
-            if(thisSection.getProperties()!=null){
-                propertiesList = thisSection.getProperties();
-            }
-            setProperties(secChild, propertiesList);
         }
 
         logger.info("leaving setSection");
@@ -271,14 +272,8 @@ public class MetadataParserImpl implements MetadataParser {
                     nameOfProperty = thisProperty.getName();
                 }
 
-
-
                 //logger.info("-----------type: "+ thisProperty.getWholeValue().getMap().get("type") + " | value " + thisProperty.getValue());
                 if(thisProperty.getValue()!=null && thisProperty.valueCount()>0){
-                    logger.debug("property related info valueCount : "+thisProperty.valueCount());
-                    logger.debug("property related info getValue: "+thisProperty.getMap().toString());
-                    logger.debug("property related info getValue: "+thisProperty.getValue().toString());
-                    logger.debug("property related info getWholeValue: "+thisProperty.getWholeValue().toString());
                     odml.core.Value wholeValue = thisProperty.getWholeValue();
                     String value = thisProperty.getValue(0).toString();
                     String valueType= wholeValue.getMap().get("type").toString();
@@ -322,10 +317,12 @@ public class MetadataParserImpl implements MetadataParser {
      */
     public List<ChannelInfo> getChannelInfo(String vhdrFile) throws IOException {
         logger.info("entering getChannelInfo");
+        List<ChannelInfo> channelInfo = new ArrayList<ChannelInfo>();
         byte[] inputHeaderFIle = convertToByteArray(vhdrFile);
         VhdrReader vhdrReader = new VhdrReader();
-        vhdrReader.readVhdr(inputHeaderFIle);
-        List<ChannelInfo> channelInfo = vhdrReader.getChannels();
+        if(inputHeaderFIle!=null)
+            vhdrReader.readVhdr(inputHeaderFIle);
+        channelInfo = vhdrReader.getChannels();
         logger.info("leaving getChannelInfo");
         return channelInfo;
 
@@ -341,7 +338,8 @@ public class MetadataParserImpl implements MetadataParser {
         logger.info("entering getMarkerInfo");
         byte[] inputMarkerFIle = convertToByteArray(vmrkFile);
         VhdrReader vhdrReader = new VhdrReader();
-        vhdrReader.readVmrk(inputMarkerFIle);
+        if(inputMarkerFIle!=null)
+            vhdrReader.readVmrk(inputMarkerFIle);
         HashMap<String, EEGMarker> markers = vhdrReader.getMarkers();
         logger.info("leaving getMarkerInfo");
         return markers;
@@ -388,15 +386,17 @@ public class MetadataParserImpl implements MetadataParser {
         Section guiSection = parentSec.createSection(property.getName(), "GUI:Namespace");
 
         List list = property.getGuiHelper().getGUINamespaceTags();
-        for(int i=0; i<list.size(); i++){
-            org.jdom.Element guiElement = (org.jdom.Element) list.get(i);
-            String elementName = new String("gui_"+guiElement.getName());
-            String elementValue = guiElement.getValue();
-            logger.debug("->"+list.get(i));
+        if(list!=null && !list.isEmpty()) {
+            for (int i = 0; i < list.size(); i++) {
+                org.jdom.Element guiElement = (org.jdom.Element) list.get(i);
+                String elementName = new String("gui_" + guiElement.getName());
+                String elementValue = guiElement.getValue();
+                logger.debug("->" + list.get(i));
 
-            Value value = new Value(elementValue);
-            guiSection.createProperty(elementName, value);
-            //value.setNull();
+                Value value = new Value(elementValue);
+                guiSection.createProperty(elementName, value);
+                //value.setNull();
+            }
         }
         //guiSection.setNull();
         logger.info("leaving processGUINamespaces");
