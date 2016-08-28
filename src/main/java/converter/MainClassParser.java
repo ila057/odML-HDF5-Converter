@@ -17,7 +17,7 @@ public class MainClassParser {
             String finalConvertedFolderToBeZipped =
                     dataProcessor.
                             generateConvertedDataSet(
-                                    "/home/lion/Downloads/EEG_ERP.zip");
+                                    "/home/lion/Downloads/Mice_blindness.zip");
 
         System.out.println("Done");
 

@@ -83,7 +83,7 @@ public class MetadataParserImpl implements MetadataParser {
         addHeaderAndMarkerInfo(rootSectionMetadata, headerFile, markerFile, vhdrExists, vmrkExists);
         logger.info("added header and marker file info");
 
-        //rootSectionMetadata.setNull();
+        rootSectionMetadata.setNull();
         logger.info("leaving setMetadata method");
 
     }
@@ -146,15 +146,15 @@ public class MetadataParserImpl implements MetadataParser {
                 channelResolution.setDouble(channelInfoItem.getResolution());
                 channelItemSection.createProperty("Resolution", channelResolution);
 
-//            channelNumber.setNull();
-//            channelName.setNull();
-//            channelUnits.setNull();
-//            channelResolution.setNull();
-//            channelItemSection.setNull();
+            channelNumber.setNull();
+            channelName.setNull();
+            channelUnits.setNull();
+            channelResolution.setNull();
+            channelItemSection.setNull();
 
                 logger.info(i + " Channel: " + channelInfoItem.getNumber() + " " + channelInfoItem.getName() + " " + channelInfoItem.getUnits() + " " + channelInfoItem.getResolution());
             }
-            //channelSection.setNull();
+            channelSection.setNull();
             logger.info("leaving setChannelInfo");
         }
     }
@@ -195,14 +195,14 @@ public class MetadataParserImpl implements MetadataParser {
             markerStimulus.setString(markerItem.getName());
             markerItemSection.createProperty("Stimulus", markerStimulus);
 
-//            markerName.setNull();
-//            markerPosition.setNull();
-//            markerStimulus.setNull();
-//            markerItemSection.setNull();
+            markerName.setNull();
+            markerPosition.setNull();
+            markerStimulus.setNull();
+            markerItemSection.setNull();
 
             logger.info(i+" Marker: "+ markerItem.getName()+" "+markerItem.getPosition()+" "+markerItem.getStimulus());
         }
-//        markerSection.setNull();
+        markerSection.setNull();
         logger.info("leaving setMarkerInfo");
 
     }
@@ -395,10 +395,10 @@ public class MetadataParserImpl implements MetadataParser {
 
                 Value value = new Value(elementValue);
                 guiSection.createProperty(elementName, value);
-                //value.setNull();
+                value.setNull();
             }
         }
-        //guiSection.setNull();
+        guiSection.setNull();
         logger.info("leaving processGUINamespaces");
 
     }
