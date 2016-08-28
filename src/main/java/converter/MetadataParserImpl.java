@@ -271,10 +271,16 @@ public class MetadataParserImpl implements MetadataParser {
                     nameOfProperty = thisProperty.getName();
                 }
 
+
+
                 //logger.info("-----------type: "+ thisProperty.getWholeValue().getMap().get("type") + " | value " + thisProperty.getValue());
-                if(thisProperty!=null && thisProperty.getValue()!=null && thisProperty.getWholeValue()!=null && thisProperty.valueCount()>0){
+                if(thisProperty.getValue()!=null && thisProperty.valueCount()>0){
+                    logger.debug("property related info valueCount : "+thisProperty.valueCount());
+                    logger.debug("property related info getValue: "+thisProperty.getMap().toString());
+                    logger.debug("property related info getValue: "+thisProperty.getValue().toString());
+                    logger.debug("property related info getWholeValue: "+thisProperty.getWholeValue().toString());
                     odml.core.Value wholeValue = thisProperty.getWholeValue();
-                    String value = thisProperty.getValue().toString();
+                    String value = thisProperty.getValue(0).toString();
                     String valueType= wholeValue.getMap().get("type").toString();
                     switch (valueType) {
                         case "datetime":

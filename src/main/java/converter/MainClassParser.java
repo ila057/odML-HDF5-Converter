@@ -17,10 +17,9 @@ public class MainClassParser {
             String finalConvertedFolderToBeZipped =
                     dataProcessor.
                             generateConvertedDataSet(
-                                    "/home/lion/incf/data/Readiness_Potential/Readiness_Potential.zip");
+                                    "/home/lion/Downloads/EEG_ERP.zip");
 
-
-        System.out.println("Done.");
+        System.out.println("Done");
 
     }
 }
